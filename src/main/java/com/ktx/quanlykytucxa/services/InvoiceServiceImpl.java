@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +27,16 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<Invoice> getAllInvoices() {
-        return invoiceRepository.findAll();
+        List<Invoice> invoices = invoiceRepository.findAll();
+        LocalDate today = LocalDate.now();
+        invoices.forEach(invoice -> {
+            if (invoice.getStatus() == InvoiceStatus.UNPAID
+                    && invoice.getDueDate() != null
+                    && invoice.getDueDate().isBefore(today)) {
+                invoice.setStatus(InvoiceStatus.PENDING);
+            }
+        });
+        return invoices;
     }
 
     @Override
@@ -43,8 +55,13 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
 
         invoice.setStudent(student);
+
         if (invoice.getCreateDate() == null) {
             invoice.setCreateDate(LocalDate.now());
+        }
+        if (invoice.getDueDate() != null && invoice.getCreateDate() != null
+                && invoice.getDueDate().isBefore(invoice.getCreateDate())) {
+            throw new RuntimeException("Ngày quá hạn không được nhỏ hơn ngày tạo");
         }
         if (invoice.getStatus() == null) {
             invoice.setStatus(InvoiceStatus.UNPAID);

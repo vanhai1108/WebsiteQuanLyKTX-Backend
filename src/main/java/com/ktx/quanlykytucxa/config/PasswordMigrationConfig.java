@@ -24,7 +24,7 @@ public class PasswordMigrationConfig {
                     continue;
                 }
 
-                // Skip if it already looks like a BCrypt hash
+
                 if (rawPassword.startsWith("$2a$") || rawPassword.startsWith("$2b$") || rawPassword.startsWith("$2y$")) {
                     continue;
                 }

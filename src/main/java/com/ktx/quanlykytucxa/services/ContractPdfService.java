@@ -25,7 +25,7 @@ public class ContractPdfService {
              PdfDocument pdf = new PdfDocument(writer);
              Document document = new Document(pdf)) {
 
-            // Set Unicode font to render Vietnamese characters correctly
+
             try {
                 URL fontUrl = getClass().getClassLoader().getResource("fonts/DejaVuSans.ttf");
                 if (fontUrl != null) {
